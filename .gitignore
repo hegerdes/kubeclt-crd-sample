@@ -3,4 +3,5 @@
 *.out
 .vscode/
 .idea/
-examples
+/dist
+out

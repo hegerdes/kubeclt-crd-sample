@@ -14,7 +14,9 @@ func schemaProp(p apiextensionsv1.JSONSchemaProps) apiextensionsv1.JSONSchemaPro
 	return p
 }
 
-func ptrBool(b bool) *bool { return &b }
+func ptrBool(b bool) *bool       { return &b }
+func ptrInt64(i int64) *int64    { return &i }
+func ptrFloat64(f float64) *float64 { return &f }
 
 func sampleCRD() *apiextensionsv1.CustomResourceDefinition {
 	spec := apiextensionsv1.JSONSchemaProps{
@@ -35,9 +37,21 @@ func sampleCRD() *apiextensionsv1.CustomResourceDefinition {
 				Type:        "integer",
 				Description: "Replicas is the desired number of widget pods.",
 			},
+			"port": {
+				Type:        "integer",
+				Description: "Port the widget listens on.",
+				Minimum:     ptrFloat64(1),
+				Maximum:     ptrFloat64(65535),
+			},
+			"hostname": {
+				Type:        "string",
+				Description: "Hostname must be at least one character.",
+				MinLength:   ptrInt64(1),
+			},
 			"tags": {
 				Type:        "array",
 				Description: "Tags is a free-form list of labels.",
+				MinItems:    ptrInt64(2),
 				Items: &apiextensionsv1.JSONSchemaPropsOrArray{
 					Schema: &apiextensionsv1.JSONSchemaProps{Type: "string"},
 				},
@@ -117,6 +131,47 @@ func TestGenerate_BasicShape(t *testing.T) {
 	// Storage version (v1) wins over v1alpha1.
 	if strings.Contains(got, "v1alpha1") {
 		t.Errorf("non-storage version leaked into output:\n%s", got)
+	}
+
+	// Constraint-aware sample values:
+	mustContain(t, got, "port: 1")               // minimum: 1
+	mustContain(t, got, "hostname: example")     // minLength: 1, default placeholder
+	// MinItems=2 means the tags array carries two sample entries.
+	if c := strings.Count(got, "- example"); c < 2 {
+		t.Errorf("expected at least 2 sample tag items (minItems=2), found %d\n%s", c, got)
+	}
+	// No empty strings should leak through ("\"\"" or trailing ": ").
+	if strings.Contains(got, ": \"\"") {
+		t.Errorf("unexpected empty string in output:\n%s", got)
+	}
+}
+
+func TestIntegerExample_RespectsBounds(t *testing.T) {
+	cases := []struct {
+		name string
+		s    apiextensionsv1.JSONSchemaProps
+		want string
+	}{
+		{"no bounds", apiextensionsv1.JSONSchemaProps{Type: "integer"}, "0"},
+		{"minimum only", apiextensionsv1.JSONSchemaProps{Type: "integer", Minimum: ptrFloat64(5)}, "5"},
+		{"exclusive min", apiextensionsv1.JSONSchemaProps{Type: "integer", Minimum: ptrFloat64(0), ExclusiveMinimum: true}, "1"},
+		{"min and max", apiextensionsv1.JSONSchemaProps{Type: "integer", Minimum: ptrFloat64(1), Maximum: ptrFloat64(65535)}, "1"},
+		{"multipleOf", apiextensionsv1.JSONSchemaProps{Type: "integer", Minimum: ptrFloat64(3), MultipleOf: ptrFloat64(5)}, "5"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := integerExample(&tc.s); got != tc.want {
+				t.Errorf("integerExample(%v) = %q, want %q", tc.s, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestStringExample_RespectsMinLength(t *testing.T) {
+	s := apiextensionsv1.JSONSchemaProps{Type: "string", MinLength: ptrInt64(20)}
+	got := stringExample(&s)
+	if int64(len(got)) < *s.MinLength {
+		t.Errorf("stringExample(MinLength=20) = %q (len %d), want at least 20 chars", got, len(got))
 	}
 }
 

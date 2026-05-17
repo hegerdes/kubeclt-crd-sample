@@ -1,8 +1,6 @@
 // Command kubectl-crd-sample is a kubectl plugin that generates an example
 // YAML manifest for a CustomResourceDefinition.
 //
-// Invocation (after placing the binary on $PATH):
-//
 //	kubectl crd-sample <crd-name>
 //
 // Standard kubectl flags such as --kubeconfig, --context and --namespace are
@@ -20,6 +18,14 @@ import (
 
 	"github.com/example/kubectl-crd-sample/internal/client"
 	"github.com/example/kubectl-crd-sample/internal/generator"
+)
+
+// Build-time metadata. Populated by goreleaser via
+// -ldflags "-X main.version=... -X main.commit=... -X main.date=...".
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
 )
 
 const usage = `Usage:
@@ -51,6 +57,7 @@ func run(args []string, stdout, stderr *os.File) error {
 	kubeFlags.AddFlags(flags)
 
 	showHelp := flags.BoolP("help", "h", false, "show usage and exit")
+	showVersion := flags.Bool("version", false, "print version information and exit")
 
 	flags.Usage = func() {
 		fmt.Fprint(stderr, usage)
@@ -65,6 +72,10 @@ func run(args []string, stdout, stderr *os.File) error {
 	}
 	if *showHelp {
 		flags.Usage()
+		return nil
+	}
+	if *showVersion {
+		fmt.Fprintf(stdout, "kubectl-crd-sample %s (commit %s, built %s)\n", version, commit, date)
 		return nil
 	}
 

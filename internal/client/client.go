@@ -1,5 +1,3 @@
-// Package client wraps the apiextensions-apiserver clientset to fetch a
-// CustomResourceDefinition by name using standard kubectl config flags.
 package client
 
 import (
@@ -12,8 +10,7 @@ import (
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
-// FetchCRD loads a CustomResourceDefinition from the API server identified by
-// the supplied ConfigFlags (which honour --kubeconfig, --context, etc.).
+// Loads a CustomResourceDefinition from the API server
 func FetchCRD(ctx context.Context, flags *genericclioptions.ConfigFlags, name string) (*apiextensionsv1.CustomResourceDefinition, error) {
 	if name == "" {
 		return nil, fmt.Errorf("CRD name must not be empty")

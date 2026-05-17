@@ -8,7 +8,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"math"
 	"sort"
+	"strconv"
 	"strings"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -138,9 +140,9 @@ func nodeFor(s *apiextensionsv1.JSONSchemaProps, depth int) (*yaml.Node, error) 
 	case "string":
 		return scalarStr(stringExample(s)), nil
 	case "integer":
-		return scalarTagged("0", "!!int"), nil
+		return scalarTagged(integerExample(s), "!!int"), nil
 	case "number":
-		return scalarTagged("0", "!!float"), nil
+		return scalarTagged(numberExample(s), "!!float"), nil
 	case "boolean":
 		return scalarTagged("false", "!!bool"), nil
 	case "":
@@ -150,11 +152,11 @@ func nodeFor(s *apiextensionsv1.JSONSchemaProps, depth int) (*yaml.Node, error) 
 			return n, nil
 		}
 		if s.XIntOrString {
-			return scalarTagged("0", "!!int"), nil
+			return scalarTagged(integerExample(s), "!!int"), nil
 		}
 		return scalarNull(), nil
 	default:
-		return scalarStr(""), nil
+		return scalarStr("example"), nil
 	}
 }
 
@@ -193,11 +195,21 @@ func objectNode(s *apiextensionsv1.JSONSchemaProps, depth int) (*yaml.Node, erro
 func arrayNode(s *apiextensionsv1.JSONSchemaProps, depth int) (*yaml.Node, error) {
 	arr := &yaml.Node{Kind: yaml.SequenceNode}
 	if s.Items != nil && s.Items.Schema != nil {
-		item, err := nodeFor(s.Items.Schema, depth+1)
-		if err != nil {
-			return nil, err
+		// Emit at least one sample item, more if minItems demands it.
+		n := 1
+		if s.MinItems != nil && int(*s.MinItems) > n {
+			n = int(*s.MinItems)
 		}
-		arr.Content = append(arr.Content, item)
+		if s.MaxItems != nil && int(*s.MaxItems) < n {
+			n = int(*s.MaxItems)
+		}
+		for i := 0; i < n; i++ {
+			item, err := nodeFor(s.Items.Schema, depth+1)
+			if err != nil {
+				return nil, err
+			}
+			arr.Content = append(arr.Content, item)
+		}
 	}
 	return arr, nil
 }
@@ -290,33 +302,98 @@ func decodeJSON(j *apiextensionsv1.JSON) (any, bool) {
 	return v, true
 }
 
-// stringExample returns a sensible placeholder for a typed string field.
+// stringExample returns a placeholder for a typed string field that satisfies
+// the schema's minLength / maxLength constraints. Pattern is not evaluated; if
+// the schema specifies a pattern, the caller may need to tweak the value.
 func stringExample(s *apiextensionsv1.JSONSchemaProps) string {
+	var val string
 	switch s.Format {
 	case "date-time":
-		return "1970-01-01T00:00:00Z"
+		val = "1970-01-01T00:00:00Z"
 	case "date":
-		return "1970-01-01"
+		val = "1970-01-01"
 	case "time":
-		return "00:00:00Z"
+		val = "00:00:00Z"
 	case "byte":
-		return "ZXhhbXBsZQ==" // base64("example")
+		val = "ZXhhbXBsZQ==" // base64("example")
 	case "duration":
-		return "1h"
+		val = "1h"
 	case "email":
-		return "user@example.com"
+		val = "user@example.com"
 	case "hostname":
-		return "example.com"
+		val = "example.com"
 	case "ipv4":
-		return "127.0.0.1"
+		val = "127.0.0.1"
 	case "ipv6":
-		return "::1"
+		val = "::1"
 	case "uri", "url":
-		return "https://example.com"
+		val = "https://example.com"
 	case "uuid":
-		return "00000000-0000-0000-0000-000000000000"
+		val = "00000000-0000-0000-0000-000000000000"
+	default:
+		val = "example"
 	}
-	return ""
+
+	if s.MinLength != nil {
+		for int64(len(val)) < *s.MinLength {
+			val += "x"
+		}
+	}
+	if s.MaxLength != nil && int64(len(val)) > *s.MaxLength {
+		val = val[:*s.MaxLength]
+	}
+	return val
+}
+
+// integerExample returns a placeholder integer that lies inside the schema's
+// [minimum, maximum] window (honouring the exclusive flags) and is a multiple
+// of multipleOf when specified.
+func integerExample(s *apiextensionsv1.JSONSchemaProps) string {
+	val := int64(0)
+	if s.Minimum != nil {
+		val = int64(math.Ceil(*s.Minimum))
+		if s.ExclusiveMinimum && float64(val) == *s.Minimum {
+			val++
+		}
+	}
+	if s.MultipleOf != nil && *s.MultipleOf > 0 {
+		step := int64(*s.MultipleOf)
+		if step > 0 && val%step != 0 {
+			val += step - (val % step)
+		}
+	}
+	if s.Maximum != nil {
+		max := int64(math.Floor(*s.Maximum))
+		if s.ExclusiveMaximum && float64(max) == *s.Maximum {
+			max--
+		}
+		if val > max {
+			val = max
+		}
+	}
+	return strconv.FormatInt(val, 10)
+}
+
+// numberExample returns a placeholder floating-point value that satisfies the
+// schema's minimum / maximum constraints.
+func numberExample(s *apiextensionsv1.JSONSchemaProps) string {
+	val := 0.0
+	if s.Minimum != nil {
+		val = *s.Minimum
+		if s.ExclusiveMinimum {
+			val = math.Nextafter(val, math.Inf(1))
+		}
+	}
+	if s.Maximum != nil {
+		max := *s.Maximum
+		if s.ExclusiveMaximum {
+			max = math.Nextafter(max, math.Inf(-1))
+		}
+		if val > max {
+			val = max
+		}
+	}
+	return strconv.FormatFloat(val, 'f', -1, 64)
 }
 
 func sortedKeys(m map[string]apiextensionsv1.JSONSchemaProps) []string {

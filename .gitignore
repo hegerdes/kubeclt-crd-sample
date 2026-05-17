@@ -1,0 +1,6 @@
+/kubectl-crd-sample
+*.test
+*.out
+.vscode/
+.idea/
+examples

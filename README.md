@@ -10,15 +10,20 @@ status, and enum values.
 
 ## Install
 
+### Via krew
+TODO
+
 ### From a release archive
 
 Download the archive for your OS/arch from the GitHub release page, extract
-it, and place the `kubectl-crd-sample` binary somewhere on your `$PATH`:
+it, and place the `kubectl-crd_sample` binary somewhere on your `$PATH`:
 
 ```sh
 tar -xzf kubectl-crd-sample_<version>_<os>_<arch>.tar.gz
-install -m 0755 kubectl-crd-sample /usr/local/bin/kubectl-crd-sample
-kubectl plugin list | grep crd-sample
+# Move
+install -m 0755 kubectl-crd-sample /usr/local/bin/kubectl-crd_sample
+# Verify
+kubectl plugin list
 ```
 
 ### From source
@@ -32,7 +37,7 @@ directory is on your `$PATH` so kubectl can discover the plugin.
 
 ### Local snapshot build with goreleaser
 
-For a reproducible local build matching the release pipeline:
+For a local build matching the release pipeline:
 
 ```sh
 goreleaser build --snapshot --clean --single-target
@@ -126,28 +131,11 @@ schema.
 ```sh
 go mod tidy
 go test ./...
-go run . <crd-name>            # for ad-hoc trials
+go run . <crd-name>
 ```
 
-Cut a release by pushing a tag; CI (or a local `goreleaser release --clean`
-with `GITHUB_TOKEN` exported) handles cross-compilation, archives, and
-checksums per `.goreleaser.yaml`.
-
-## Project layout
-
-```
-.
-├── main.go                          # entrypoint, flag parsing
-├── internal/
-│   ├── client/client.go             # apiextensions clientset wrapper
-│   └── generator/
-│       ├── generator.go             # schema -> yaml.Node with comments
-│       └── generator_test.go        # in-memory CRD tests
-├── examples/widget-crd.yaml         # sample CRD for local trials
-├── .goreleaser.yaml                 # release & cross-compile config
-├── go.mod
-└── README.md
-```
+Release are created via CI on tags (for local do `goreleaser release --clean`
+with `GITHUB_TOKEN` exported).
 
 ## Limitations
 

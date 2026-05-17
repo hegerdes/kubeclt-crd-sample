@@ -14,7 +14,7 @@ before:
 builds:
   - id: kubectl-crd-sample
     main: .
-    binary: kubectl-crd-sample
+    binary: kubectl-crd_sample
     env:
       - CGO_ENABLED=0
     flags:
@@ -35,7 +35,7 @@ builds:
 
 archives:
   - id: default
-    ids:
+    builds:
       - kubectl-crd-sample
     name_template: >-
       {{ .ProjectName }}_
@@ -43,10 +43,10 @@ archives:
       {{- .Os }}_
       {{- if eq .Arch "amd64" }}x86_64
       {{- else }}{{ .Arch }}{{ end }}
-    formats: [tar.gz]
+    format: tar.gz
     format_overrides:
       - goos: windows
-        formats: [zip]
+        format: zip
     files:
       - README.md
       - LICENSE*

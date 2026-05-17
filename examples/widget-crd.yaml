@@ -1,0 +1,71 @@
+# Sample CRD for local trials.
+#
+#   kubectl apply -f examples/widget-crd.yaml
+#   kubectl crd-sample widgets.example.com
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: widgets.example.com
+spec:
+  group: example.com
+  scope: Namespaced
+  names:
+    plural: widgets
+    singular: widget
+    kind: Widget
+    shortNames:
+      - wdg
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              description: WidgetSpec describes the desired state of a Widget.
+              required:
+                - size
+              properties:
+                size:
+                  type: string
+                  description: Size selects the widget size.
+                  enum:
+                    - small
+                    - medium
+                    - large
+                replicas:
+                  type: integer
+                  description: Replicas is the desired number of widget pods.
+                  minimum: 0
+                  default: 1
+                tags:
+                  type: array
+                  description: Tags is a free-form list of labels.
+                  items:
+                    type: string
+                annotations:
+                  type: object
+                  description: Annotations is a free-form map of strings.
+                  additionalProperties:
+                    type: string
+                schedule:
+                  type: object
+                  description: Schedule controls when the widget runs.
+                  properties:
+                    cron:
+                      type: string
+                      description: Cron expression for the schedule.
+                    timezone:
+                      type: string
+                      description: IANA timezone for the schedule.
+                      default: UTC
+            status:
+              type: object
+              properties:
+                ready:
+                  type: boolean
+      subresources:
+        status: {}

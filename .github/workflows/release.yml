@@ -43,11 +43,9 @@ jobs:
         continue-on-error: true
         with:
           subject-path: |
-            dist/static-credential-provider_darwin_amd64_v1/*
-            dist/static-credential-provider_darwin_arm64/*
-            dist/static-credential-provider_linux_amd64_v1/*
-            dist/static-credential-provider_linux_arm64/*
-            dist/static-credential-provider_linux_ppc64le/*
-            dist/static-credential-provider_linux_s390x/*
-            dist/static-credential-provider_windows_amd64_v1/*
-            dist/static-credential-provider_windows_arm64/*
+            dist/ kubectl-crd-sample_darwin_amd64_v1/*
+            dist/ kubectl-crd-sample_darwin_arm64_v8.0/*
+            dist/ kubectl-crd-sample_linux_amd64_v1/*
+            dist/ kubectl-crd-sample_linux_arm64/v8.0/*
+            dist/ kubectl-crd-sample_windows_amd64_v1/*
+            dist/ kubectl-crd-sample_windows_arm64/v8.0/*

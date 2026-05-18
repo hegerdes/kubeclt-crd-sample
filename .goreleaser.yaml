@@ -35,7 +35,7 @@ builds:
 
 archives:
   - id: default
-    builds:
+    ids:
       - kubectl-crd-sample
     name_template: >-
       {{ .ProjectName }}_
@@ -43,10 +43,10 @@ archives:
       {{- .Os }}_
       {{- if eq .Arch "amd64" }}x86_64
       {{- else }}{{ .Arch }}{{ end }}
-    format: tar.gz
+    formats: [tar.gz]
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
     files:
       - README.md
       - LICENSE*

@@ -21,7 +21,7 @@ it, and place the `kubectl-crd_sample` binary somewhere on your `$PATH`:
 ```sh
 tar -xzf kubectl-crd-sample_<version>_<os>_<arch>.tar.gz
 # Move
-install -m 0755 kubectl-crd-sample /usr/local/bin/kubectl-crd_sample
+install -m 0755 kubectl-crd_sample /usr/local/bin/kubectl-crd_sample
 # Verify
 kubectl plugin list
 ```
@@ -29,7 +29,7 @@ kubectl plugin list
 ### From source
 
 ```sh
-go install github.com/example/kubectl-crd-sample@latest
+go install github.com/hegerdes/kubectl-crd-sample@latest
 ```
 
 This drops `kubectl-crd-sample` into `$(go env GOPATH)/bin`; ensure that

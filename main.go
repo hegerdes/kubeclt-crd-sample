@@ -16,8 +16,8 @@ import (
 	"github.com/spf13/pflag"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 
-	"github.com/example/kubectl-crd-sample/internal/client"
-	"github.com/example/kubectl-crd-sample/internal/generator"
+	"github.com/hegerdes/kubectl-crd-sample/internal/client"
+	"github.com/hegerdes/kubectl-crd-sample/internal/generator"
 )
 
 // Build-time metadata. Populated by goreleaser

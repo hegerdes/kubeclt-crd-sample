@@ -1,4 +1,4 @@
-module github.com/example/kubectl-crd-sample
+module github.com/hegerdes/kubectl-crd-sample
 
 go 1.26.3
 

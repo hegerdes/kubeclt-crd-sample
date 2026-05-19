@@ -68,6 +68,7 @@ changelog:
       - "^chore:"
       - "Merge pull request"
       - "Merge branch"
+  format: "{{ .Commit.ShortHash }}: {{ .Message }} ({{ .AuthorUsername }})"
   groups:
     - title: Features
       regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
@@ -86,5 +87,5 @@ release:
     ## kubectl-crd-sample v{{ .Version }}
 
     Install by downloading the archive for your OS/arch below, extracting the
-    `kubectl-crd-sample` binary, and placing it somewhere on your `$PATH`.
+    `kubectl-crd_sample` binary, and placing it somewhere on your `$PATH`.
     `kubectl` will then discover it as the `crd-sample` subcommand.

@@ -1,0 +1,53 @@
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: crd-sample
+spec:
+  version: {{ .TagName }}
+  homepage: https://github.com/hegerdes/kubectl-crd-sample
+  shortDescription: Generates an example manifest based of an CRD
+  description: |
+    This plugin takes the name of an CRD (including the api-group)
+    and generates an example manifest according to the CRDs OpenAPI-Schema.
+  platforms:
+  - selector:
+      matchLabels:
+        os: darwin
+        arch: amd64
+    bin: kubectl-crd_sample
+    {{addURIAndSha "https://github.com/hegerdes/kubeclt-crd-sample/releases/download/{{ .TagName }}/kubectl-crd-sample_{{ .TagName }}_darwin_x86_64.tar.gz .TagName }}
+
+  - selector:
+      matchLabels:
+        os: darwin
+        arch: arm64
+    bin: kubectl-crd_sample
+    {{addURIAndSha "https://github.com/hegerdes/kubeclt-crd-sample/releases/download/{{ .TagName }}/kubectl-crd-sample_{{ .TagName }}_darwin_arm64.tar.gz .TagName }}
+
+  - selector:
+      matchLabels:
+        os: linux
+        arch: amd64
+    bin: kubectl-crd_sample
+    {{addURIAndSha "https://github.com/hegerdes/kubeclt-crd-sample/releases/download/{{ .TagName }}/kubectl-crd-sample_{{ .TagName }}_linux_x86_64.tar.gz .TagName }}
+
+  - selector:
+      matchLabels:
+        os: linux
+        arch: arm64
+    bin: kubectl-crd_sample
+    {{addURIAndSha "https://github.com/hegerdes/kubeclt-crd-sample/releases/download/{{ .TagName }}/kubectl-crd-sample_{{ .TagName }}_linux_arm64.tar.gz .TagName }}
+
+  - selector:
+      matchLabels:
+        os: windows
+        arch: amd64
+    bin: kubectl-crd_sample.exe
+    {{addURIAndSha "https://github.com/hegerdes/kubeclt-crd-sample/releases/download/{{ .TagName }}/kubectl-crd-sample_{{ .TagName }}_windows_x86_64.zip .TagName }}
+
+  - selector:
+      matchLabels:
+        os: windows
+        arch: arm64
+    {{addURIAndSha "kubectl-crd_sample.exe
+    uri: https://github.com/hegerdes/kubeclt-crd-sample/releases/download/{{ .TagName }}/kubectl-crd-sample_{{ .TagName }}_windows_arm64.zip .TagName }}

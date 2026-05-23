@@ -68,7 +68,6 @@ changelog:
       - "^chore:"
       - "Merge pull request"
       - "Merge branch"
-  format: "{{ .SHA }}: {{ .Message }} ({{ with .Author.Username }}@{{ . }}{{ else }}{{ .Author.Name }} {{ end }})"
   groups:
     - title: Features
       regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'

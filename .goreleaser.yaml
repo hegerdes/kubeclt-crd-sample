@@ -89,3 +89,8 @@ release:
     Install by downloading the archive for your OS/arch below, extracting the
     `kubectl-crd_sample` binary, and placing it somewhere on your `$PATH`.
     `kubectl` will then discover it as the `crd-sample` subcommand.
+
+    Release artifacts are singed by GitHub Actions Attest Action and can be verified by running
+    ```bash
+    gh attestation verify --owner hegerdes <artifact>
+    ```

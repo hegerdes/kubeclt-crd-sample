@@ -10,6 +10,7 @@ permissions:
   id-token: write
   attestations: write
   security-events: write
+  artifact-metadata: write
 
 jobs:
   Release:
@@ -25,6 +26,7 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
+          cache: false
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v7
@@ -35,7 +37,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v4
+        uses: actions/attest@v4
         continue-on-error: true
         with:
           subject-path: |

@@ -8,6 +8,12 @@ server and walks it to emit a fully-formed `<group>/<version>` manifest, with
 inline comments that surface each field's description, required/optional
 status, and enum values.
 
+## TLDR Usage
+
+```sh
+kubectl crd-sample <crd-name>
+```
+
 ## Install
 
 ### Via krew
@@ -34,16 +40,6 @@ go install github.com/hegerdes/kubectl-crd-sample@latest
 
 This drops `kubectl-crd-sample` into `$(go env GOPATH)/bin`; ensure that
 directory is on your `$PATH` so kubectl can discover the plugin.
-
-### Local snapshot build with goreleaser
-
-For a local build matching the release pipeline:
-
-```sh
-goreleaser build --snapshot --clean --single-target
-```
-
-The binary is produced under `dist/`.
 
 ## Usage
 

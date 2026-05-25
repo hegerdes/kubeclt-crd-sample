@@ -51,3 +51,6 @@ jobs:
       - name: Update new version in krew-index
         uses: rajatjindal/krew-release-bot@v0.0.51
         continue-on-error: true
+        env:
+          UPSTREAM_KREW_INDEX_REPO_NAME: kubeclt-crd-example
+          UPSTREAM_KREW_INDEX_REPO_OWNER: hegerdes

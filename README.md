@@ -11,7 +11,10 @@ status, and enum values.
 ## Install
 
 ### Via krew
-TODO
+```bash
+kubectl krew install --manifest-url https://raw.githubusercontent.com/hegerdes/krew-index/refs/heads/main/plugins/crd-sample.yaml
+kubectl plugin list
+```
 
 ### From a release archive
 
@@ -148,3 +151,8 @@ with `GITHUB_TOKEN` exported).
   to satisfy a CRD's pattern constraint.
 - `x-kubernetes-validations` CEL rules are not surfaced in comments.
 - Schemas exceeding 64 levels of nesting are truncated with a marker comment.
+
+## Alternatives
+
+- For build-in types use `kubectl create <type> --dry-run=client -o yaml`
+- Or use [kubectl-schemagen](https://github.com/ogormans-deptstack/kubectl-schemagen) by [ogormans-deptstack](https://github.com/ogormans-deptstack) - it handles CRDs and build-in types

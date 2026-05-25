@@ -18,7 +18,8 @@ kubectl crd-sample <crd-name>
 
 ### Via krew
 ```bash
-kubectl krew install --manifest-url https://raw.githubusercontent.com/hegerdes/krew-index/refs/heads/main/plugins/crd-sample.yaml
+# Directly install
+kubectl krew install --manifest-url https://raw.githubusercontent.com/hegerdes/kubeclt-crd-sample/refs/heads/main/plugins/crd-sample.yaml
 kubectl plugin list
 ```
 

@@ -48,9 +48,17 @@ jobs:
             dist/kubectl-crd-sample_windows_amd64_v1/*
             dist/kubectl-crd-sample_windows_arm64_v8.0/*
 
-      - name: Update new version in krew-index
+      - name: Update new version in local krew-index
         uses: rajatjindal/krew-release-bot@v0.0.51
         continue-on-error: true
+        with:
+          krew_template_file: krew/local.krew.yaml
         env:
           UPSTREAM_KREW_INDEX_REPO_NAME: kubeclt-crd-example
           UPSTREAM_KREW_INDEX_REPO_OWNER: hegerdes
+
+      # - name: Update new version in official krew-index
+      #   uses: rajatjindal/krew-release-bot@v0.0.51
+      #   continue-on-error: true
+      #   with:
+      #     krew_template_file: krew/default.krew.yaml

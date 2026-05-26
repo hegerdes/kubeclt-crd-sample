@@ -20,9 +20,12 @@ kubectl crd-sample <crd-name>
 ```bash
 # Directly install
 kubectl krew install --manifest-url https://raw.githubusercontent.com/hegerdes/kubeclt-crd-sample/refs/heads/main/plugins/crd-sample.yaml
-# Or via extra index that supports auto update
+# Or via extra index to get the latest updates
 kubectl krew index add crd-sample https://github.com/hegerdes/kubeclt-crd-sample.git
 kubectl krew install crd-sample/crd-sample
+# Or the official index
+kubectl krew install crd-sample
+# Verify
 kubectl plugin list
 ```
 
@@ -32,21 +35,14 @@ Download the archive for your OS/arch from the GitHub release page, extract
 it, and place the `kubectl-crd_sample` binary somewhere on your `$PATH`:
 
 ```sh
-tar -xzf kubectl-crd-sample_<version>_<os>_<arch>.tar.gz
+# Download and extract
+curl -sL <DOWNLOAD_URL> -o kubectl-crd-sample.tar.gz
+tar -xzvf kubectl-crd-sample.tar.gz
 # Move
 install -m 0755 kubectl-crd_sample /usr/local/bin/kubectl-crd_sample
 # Verify
 kubectl plugin list
 ```
-
-### From source
-
-```sh
-go install github.com/hegerdes/kubectl-crd-sample@latest
-```
-
-This drops `kubectl-crd-sample` into `$(go env GOPATH)/bin`; ensure that
-directory is on your `$PATH` so kubectl can discover the plugin.
 
 ## Usage
 
